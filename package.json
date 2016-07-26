@@ -1,0 +1,22 @@
+{
+  "name": "dojo-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scosmaa/DojoPlayground.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/scosmaa/DojoPlayground/issues"
+  },
+  "homepage": "https://github.com/scosmaa/DojoPlayground#readme",
+  "dependencies": {
+    "seneca": "^2.1.0"
+  }
+}
