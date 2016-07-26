@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/scosmaa/DojoPlayground#readme",
   "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
     "seneca": "^2.1.0"
   }
 }
