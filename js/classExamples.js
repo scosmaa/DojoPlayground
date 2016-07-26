@@ -54,14 +54,16 @@ require(['dojo/_base/declare'], function (declare) {
             console.log('If I print this, it works!');
             this.inherited(arguments);
         },
-        constructor: function () {
+        constructor: function (args) {
+            declare.safeMixin(this, args);
           console.log('SubClass constructor called!')
         }
     });
 
-    var subObject = new SubClass();
+    var subObject = new SubClass({passedByConstructor: true});
     console.log('subObject -> fieldA',subObject.fieldA);
     console.log('subObject -> fieldB',subObject.fieldB);
     subObject.methodB();
     subObject.methodToOverride('I also want to call the overridden method, so if you see this, it works properly!');
+    console.assert(subObject.passedByConstructor, 'Successfull mixed in')
 });
