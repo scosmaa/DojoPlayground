@@ -6,9 +6,12 @@ require([
         'gridx/Grid',
         'gridx/core/model/cache/Sync',
         'gridx/modules/SingleSort', //Require module source code
-        'gridx/modules/ColumnResizer'   //Require module source code
+        'gridx/modules/ColumnResizer',   //Require module source code
+        'gridx/support/LinkPager',
+        'gridx/modules/Pagination',
+        'gridx/modules/pagination/PaginationBar'
     ],
-    function (Store, Grid, Cache, SingleSort, ColumnResizer) {
+    function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination,PaginationBar) {
 
         var beatles = [
             {id: 1, name: 'John', surname: 'Lennon', instrument: 'Guitar'},
@@ -37,10 +40,13 @@ require([
             // You can access to the each module using gridVariable.moduleName
             modules: [
                 SingleSort,
-                ColumnResizer
+                ColumnResizer,
+                Pagination, PaginationBar
             ],
             // You can pass parameters to a single module using the convention moduleNameParameterName
-            columnResizerMinWidth: 10
+            columnResizerMinWidth: 10,
+            paginationInitialPageSize: 1,
+            paginationBarMessage: "${2} to ${3} of ${0} items ${1} items selected"
         }, 'gridNode');
 
         grid.startup();
@@ -65,6 +71,23 @@ require([
         // A module can depend on other modules
         grid.model.when({},function(){
             console.log('I have done!');
+            // refresh UI
             grid.body.refresh();
         });
+
+        setTimeout(function () {
+            beatles.push(
+                {id: 5, name: 'Billy', surname: 'Preston', instrument: 'Piano'}
+            );
+            grid.model.clearCache();
+            console.log(beatles);
+            grid.model.store.setData(beatles);
+            grid.body.refresh();
+            grid.sort.sort(1);
+        }, 5000);
+
+        // Pagination Section
+        var pager = new LinkPager({
+            grid: grid     // a grid instance is expected
+        }, 'pager');
     });
