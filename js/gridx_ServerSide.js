@@ -2,23 +2,19 @@
  * Created by s.cosma on 27/07/2016.
  */
 require([
-        'dojo/store/Memory',
+        'dojo/store/JsonRest',
         'gridx/Grid',
-        'gridx/core/model/cache/Sync',
+        'gridx/core/model/cache/ASync',
         'gridx/modules/SingleSort', //Require module source code
-        'gridx/modules/ColumnResizer'   //Require module source code
+        'gridx/modules/ColumnResizer',   //Require module source code
+        'gridx/support/LinkPager',
+        'gridx/modules/Pagination',
+        'gridx/modules/pagination/PaginationBar'
     ],
-    function (Store, Grid, Cache, SingleSort, ColumnResizer) {
-
-        var beatles = [
-            {id: 1, name: 'John', surname: 'Lennon', instrument: 'Guitar'},
-            {id: 2, name: 'Paul', surname: 'McCartney', instrument: 'Bass'},
-            {id: 3, name: 'George', surname: 'Harrison', instrument: 'Guitar'},
-            {id: 4, name: 'Ringo', surname: 'Starr', instrument: 'Drums'}
-        ];
+    function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination, PaginationBar) {
 
         var gridModel = new Store({
-            data: beatles
+            target: "http://localhost:8080/griddata"
         });
 
         var columns = [
@@ -37,38 +33,14 @@ require([
             // You can access to the each module using gridVariable.moduleName
             modules: [
                 SingleSort,
-                ColumnResizer
+                ColumnResizer,
+                Pagination, PaginationBar
             ],
             // You can pass parameters to a single module using the convention moduleNameParameterName
-            columnResizerMinWidth: 10
+            columnResizerMinWidth: 10,
+            paginationInitialPageSize: 10,
+            pageSize:10
         }, 'gridNode');
 
         grid.startup();
-
-        // Some basic API operations
-
-        console.log('Row', grid.row(1));
-        console.log('Row id', grid.row(1).id);
-
-        console.log('Cell content', grid.cell(0,0).data);
-
-        console.log('Column', grid.column(1));
-        console.log('Column Name', grid.column(1).name);
-
-        // columns.pop();
-        //
-        // grid.setColumns(columns);
-
-        grid.model.sort([{colId: 'name'}]);
-
-        // You can customize a module creating a new one with the same moduleName. Pay attention to respect the same API set
-        // A module can depend on other modules
-        grid.model.when({start: 0}, function(){
-            console.log('I have done!');
-            // anything possible to use these rows...
-            var row1 = grid.model.byIndex(0);
-            var row2 = grid.model.byId('abc');
-            console.log(row1.data.column1);
-            console.log(row2.rawData.field1);
-        });
     });
