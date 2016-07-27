@@ -50,21 +50,25 @@ require([
         console.log('Row', grid.row(1));
         console.log('Row id', grid.row(1).id);
 
-        console.log('Cell content', grid.cell(0,0).data());
+        console.log('Cell content', grid.cell(0,0).data);
 
         console.log('Column', grid.column(1));
-        console.log('Column Name', grid.column(1).name());
+        console.log('Column Name', grid.column(1).name);
 
         // columns.pop();
+        //
         // grid.setColumns(columns);
 
-
-        grid.model.sort([{colId: "2", descending: 1}]);
+        grid.model.sort([{colId: 'name'}]);
 
         // You can customize a module creating a new one with the same moduleName. Pay attention to respect the same API set
         // A module can depend on other modules
-        grid.model.when({},function(){
+        grid.model.when({start: 0}, function(){
             console.log('I have done!');
-            grid.body.refresh();
+            // anything possible to use these rows...
+            var row1 = grid.model.byIndex(0);
+            var row2 = grid.model.byId('abc');
+            console.log(row1.data.column1);
+            console.log(row2.rawData.field1);
         });
     });
