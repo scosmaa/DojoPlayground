@@ -9,10 +9,12 @@ require([
         'gridx/modules/ColumnResizer',   //Require module source code
         'gridx/support/LinkPager',
         'gridx/modules/Pagination',
-        'gridx/modules/pagination/PaginationBar'
+        'gridx/modules/pagination/PaginationBar',
+        'custom/CustomModule',
+        'custom/CustomBodyModule'
     ],
-    function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination,PaginationBar) {
-
+    function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination,PaginationBar,CustomModule,CustomBodyModule) {
+    console.log(CustomModule);
         var beatles = [
             {id: 1, name: 'John', surname: 'Lennon', instrument: 'Guitar'},
             {id: 2, name: 'Paul', surname: 'McCartney', instrument: 'Bass'},
@@ -41,11 +43,14 @@ require([
             modules: [
                 SingleSort,
                 ColumnResizer,
-                Pagination, PaginationBar
+                Pagination,
+                PaginationBar,
+                CustomModule,
+                CustomBodyModule
             ],
             // You can pass parameters to a single module using the convention moduleNameParameterName
             columnResizerMinWidth: 10,
-            paginationInitialPageSize: 1,
+            paginationInitialPageSize: 15,
             paginationBarMessage: "${2} to ${3} of ${0} items ${1} items selected"
         }, 'gridNode');
 
@@ -90,4 +95,8 @@ require([
         var pager = new LinkPager({
             grid: grid     // a grid instance is expected
         }, 'pager');
+
+        // customModule method test
+
+        grid.customModule.printSomethingFromMe('I like to being called from external sources');
     });
