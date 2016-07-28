@@ -1,5 +1,6 @@
 /**
  * Created by s.cosma on 27/07/2016.
+ * This https://xcellerant.net/gridx-in-xpages/ contains useful info about gridX
  */
 require([
         'dojo/store/JsonRest',
@@ -9,9 +10,11 @@ require([
         'gridx/modules/ColumnResizer',   //Require module source code
         'gridx/support/LinkPager',
         'gridx/modules/Pagination',
-        'gridx/modules/pagination/PaginationBar'
+        'gridx/modules/pagination/PaginationBar',
+        "gridx/modules/Filter",
+        "gridx/modules/filter/QuickFilter"
     ],
-    function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination, PaginationBar) {
+    function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination, PaginationBar, Filter, QuickFilter) {
 
         var gridModel = new Store({
             target: "http://localhost:8080/griddata"
@@ -19,9 +22,9 @@ require([
 
         var columns = [
             {field: 'id', name: 'Identity'},
-            {field: 'name', name: 'Name'},
-            {field: 'surname', name: 'Surname'},
-            {field: 'instrument', name: 'Main Instrument'}
+            {field: 'name', name: 'Name', sortable: false},
+            {field: 'surname', name: 'Surname', sortable: false},
+            {field: 'instrument', name: 'Main Instrument', sortable: false}
         ];
 
         grid = new Grid({
@@ -34,12 +37,22 @@ require([
             modules: [
                 SingleSort,
                 ColumnResizer,
-                Pagination, PaginationBar
+                Pagination,
+                PaginationBar,
+                Filter,
+                QuickFilter
             ],
             // You can pass parameters to a single module using the convention moduleNameParameterName
             columnResizerMinWidth: 10,
             paginationInitialPageSize: 10,
-            pageSize:10
+            pageSize:10,
+            filterServerMode: true,
+            filterSetupQuery: function(expr){
+                // Filter data structure is a complex object, we simplify with a query string
+                var value = expr.data[0].data[1].data;
+                console.log(value);
+                return ['?filter=',value].join('');
+            }
         }, 'gridNode');
 
         grid.startup();
