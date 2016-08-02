@@ -63,7 +63,7 @@ app.get('/griddata', function (req, res) {
 
     // Simulating delay (testing loading support)
     setTimeout(function () {
-        res.send(result.slice(firstIndex, firstIndex + 9 ));
+        res.send(result.slice(firstIndex, firstIndex + 10 ));
     }, 2000);
 });
 

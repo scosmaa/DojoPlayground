@@ -50,7 +50,7 @@ require([
             ],
             // You can pass parameters to a single module using the convention moduleNameParameterName
             columnResizerMinWidth: 10,
-            paginationInitialPageSize: 15,
+            paginationInitialPageSize: 10,
             paginationBarMessage: "${2} to ${3} of ${0} items ${1} items selected"
         }, 'gridNode');
 

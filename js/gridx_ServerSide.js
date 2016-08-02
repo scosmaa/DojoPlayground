@@ -46,6 +46,7 @@ require([
             columnResizerMinWidth: 10,
             paginationInitialPageSize: 10,
             pageSize:10,
+            cacheSize: 10,
             filterServerMode: true,
             filterSetupQuery: function(expr){
                 // Filter data structure is a complex object, we simplify with a query string
