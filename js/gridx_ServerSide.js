@@ -17,6 +17,7 @@ require([
     function (Store, Grid, Cache, SingleSort, ColumnResizer, LinkPager, Pagination, PaginationBar, Filter, QuickFilter) {
 
         var gridModel = new Store({
+            headers: {'cache-control' : 'no-cache'},
             target: "http://localhost:8080/griddata"
         });
 
@@ -46,7 +47,7 @@ require([
             columnResizerMinWidth: 10,
             paginationInitialPageSize: 10,
             pageSize:10,
-            cacheSize: 10,
+            cacheSize: 0, /* WARNING: If the cacheSize = 0  add 'cache-control' : 'no-cache' in the headers field of data store*/
             filterServerMode: true,
             filterSetupQuery: function(expr){
                 // Filter data structure is a complex object, we simplify with a query string

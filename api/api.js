@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 var enableCors = function (res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Expose-Headers", "Content-Range");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With, X-Range, Access-Control-Max-Age, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Allow-Credentials, Access-Control-Allow-Headers, Range, Content-Range, Access-Control-Expose-Headers");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With, X-Range, Access-Control-Max-Age, Access-Control-Allow-Methods, Access-Control-Allow-Origin, Access-Control-Allow-Credentials, Access-Control-Allow-Headers, Range, Content-Range, Access-Control-Expose-Headers, cache-control");
 };
 
 app.post('/method1', function (req, res) {
