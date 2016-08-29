@@ -46,15 +46,9 @@ require([
             // You can pass parameters to a single module using the convention moduleNameParameterName
             columnResizerMinWidth: 10,
             paginationInitialPageSize: 10,
-            pageSize:10,
-            cacheSize: 0, /* WARNING: If the cacheSize = 0  add 'cache-control' : 'no-cache' in the headers field of data store*/
-            filterServerMode: true,
-            filterSetupQuery: function(expr){
-                // Filter data structure is a complex object, we simplify with a query string
-                var value = expr.data[0].data[1].data;
-                console.log(value);
-                return ['?filter=',value].join('');
-            }
+            pageSize: 10,
+            cacheSize: 10, /* WARNING: If the cacheSize = 0  add 'cache-control' : 'no-cache' in the headers field of data store*/
+            filterServerMode: true
         }, 'gridNode');
 
         grid.startup();

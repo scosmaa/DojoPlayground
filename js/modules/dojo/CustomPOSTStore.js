@@ -1,13 +1,14 @@
 /**
  * Created by s.cosma on 23/08/2016.
  */
-define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "dojo/store/util/QueryResults" /*=====, "./api/Store" =====*/
-], function(request, lang, JSON, declare, QueryResults /*=====, Store =====*/){
+define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "dojo/store/util/QueryResults", "dojo/Deferred" /*=====, "./api/Store" =====*/
+], function(request, lang, JSON, declare, QueryResults, Deferred /*=====, Store =====*/){
 
     return declare(null, {
         // summary:
-        //		This is a store used to communicating with a server through JSON
-        //		formatted data using post method. It implements dojo/store/api/Store.
+        //		Questo store rappresenta un POC da utilizzare con gridX. Utilizza il verbo POST
+        //      per effettuare le chiamate lato server. Tutti i parametri (id della get, filtraggio, ordinamento)
+        //      sono passati "temporaneamente" nel body della richiesta.
 
         constructor: function(options){
             this.headers = {};
@@ -15,42 +16,40 @@ define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "d
         },
 
         // headers: Object
-        //		Additional headers to pass in all requests to the server. These can be overridden
-        //		by passing additional headers to calls to the store.
+        //		Eventuali header addizionali da passare al server
         headers: {},
 
         // accepts: String
-        //		Defines the Accept header to use on HTTP requests
+        //		Campo Accept dell'header (tipi di risposte accettate)
         accepts: "application/javascript, application/json",
 
         // target: String
-        //		The target base URL to use for all requests to the server. This string will be
-        //		prepended to the id to generate the URL (relative or absolute) for requests
-        //		sent to the server
+        //		Il base path per effettuare le chiamate lato server
         target: "",
 
         // idProperty: String
-        //		Indicates the property to use as the identity property. The values of this
-        //		property should be unique.
+        //		Nome del campo che contiene l'identificativo univoco degli oggetti dell'array
         idProperty: "id",
 
+        //  Metodi che  vengono chiamati lato server in base all'operazione da effettuare (concatenazione con target)
+        /*  TODO POC: attualmente PUT/ADD fanno la stessa cosa. In realtà il put dovrebbe modificare se esistente, aggiungere
+            se nuovo. L'add fa solo l'aggiunta
+        */
         getMethodName: 'get',
-
         putMethodName: 'put',
-
         addMethodName: 'put',
+        removeMethodName: 'remove',
+        queryMethodName: 'query',
 
         get: function(id, options){
             // summary:
-            //		Retrieves an object by its identity. This will trigger a POST request to the server using
-            //		the url `this.target + this.getMethodName`.
+            //		Restituisce un oggetto in base all'id in input
             // id: Number
-            //		The identity to use to lookup the object
+            //		Identificativo dell'oggetto
             // options: Object?
-            //		HTTP headers. For consistency with other methods, if a `headers` key exists on this object, it will be
-            //		used to provide HTTP headers instead.
+            //		Lasciato perché presente in tutti gli store analizzati.
             // returns: Object
-            //		The object in the store that matches the given id.
+            //		L'oggetto con l'id corrispondente.
             options = options || {};
             var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers || options);
             return request.post([this.target,this.getMethodName].join('/'), {
@@ -62,25 +61,14 @@ define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "d
             });
         },
 
+        // Restituisce l'identificativo del cliente in base al campo corrispondente
         getIdentity: function(object){
-            // summary:
-            //		Returns an object's identity
-            // object: Object
-            //		The object to get the identity from
-            // returns: Number
             return object[this.idProperty];
         },
 
+        // Modifica un oggetto se esistente o ne inserisce uno nuovo
+        // Restituisce un oggetto deferred
         put: function(object, options){
-            // summary:
-            //		Stores an object. This will trigger a PUT request to the server
-            //		if the object has an id, otherwise it will trigger a POST request.
-            // object: Object
-            //		The object to store.
-            // options: __PutDirectives?
-            //		Additional metadata for storing the data.  Includes an "id"
-            //		property if a specific id is to be used.
-            // returns: dojo/_base/Deferred
             options = options || {};
             object.id = object.id || options.id;
             var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers || options);
@@ -91,15 +79,10 @@ define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "d
             });
         },
 
+        // Modifica un oggetto se esistente o ne inserisce uno nuovo
+        // Restituisce un oggetto deferred
+        // TODO: dovrebbe solo aggiungere oggetti nuovi
         add: function(object, options){
-            // summary:
-            //		Adds an object. This will trigger a PUT request to the server
-            //		if the object has an id, otherwise it will trigger a POST request.
-            // object: Object
-            //		The object to store.
-            // options: __PutDirectives?
-            //		Additional metadata for storing the data.  Includes an "id"
-            //		property if a specific id is to be used.
             options = options || {};
             object.id = object.id || options.id;
             var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers || options);
@@ -110,67 +93,65 @@ define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "d
             });
         },
 
+        // Rimuove l'oggetto all'interno dello store in base all'id in input
         remove: function(id, options){
-            // summary:
-            //		Deletes an object by its identity. This will trigger a DELETE request to the server.
-            // id: Number
-            //		The identity to use to delete the object
-            // options: __HeaderOptions?
-            //		HTTP headers.
             options = options || {};
-            return xhr("DELETE", {
-                url: this.target + id,
-                headers: lang.mixin({}, this.headers, options.headers)
+            var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers || options);
+
+            return request.post([this.target,this.removeMethodName].join('/'), {
+                data: {
+                    id: id || options.id
+                },
+                handleAs: "json",
+                headers: headers
             });
         },
 
+        //  Metodo fondamentale di uno store.
+        //  Si occupa di contattare il server per le operazioni di filtraggio, ordinamento (multiplo)
+        //  paginazione, ecc.
         query: function(query, options){
-            // summary:
-            //		Queries the store for objects. This will trigger a GET request to the server, with the
-            //		query added as a query string.
-            // query: Object
-            //		The query to use for retrieving objects from the store.
-            // options: __QueryOptions?
-            //		The optional arguments to apply to the resultset.
-            // returns: dojo/store/api/Store.QueryResults
-            //		The results of the query, extended with iterative methods.
+            var POSTParams = {};
             options = options || {};
 
             var headers = lang.mixin({ Accept: this.accepts }, this.headers, options.headers);
 
-            if(options.start >= 0 || options.count >= 0){
-                headers.Range = headers["X-Range"] //set X-Range for Opera since it blocks "Range" header
-                    = "items=" + (options.start || '0') + '-' +
-                    (("count" in options && options.count != Infinity) ?
-                        (options.count + (options.start || 0) - 1) : '');
+            // Filtro
+            if(query.data){
+                POSTParams.filterData = JSON.stringify(query.data);
             }
-            var hasQuestionMark = this.target.indexOf("?") > -1;
-            if(query && typeof query == "object"){
-                query = xhr.objectToQuery(query);
-                query = query ? (hasQuestionMark ? "&" : "?") + query: "";
-            }
+
+            // Ordinamento multiplo
             if(options && options.sort){
-                var sortParam = this.sortParam;
-                query += (query || hasQuestionMark ? "&" : "?") + (sortParam ? sortParam + '=' : "sort(");
+                POSTParams.sortParams = [];
                 for(var i = 0; i<options.sort.length; i++){
                     var sort = options.sort[i];
-                    query += (i > 0 ? "," : "") + (sort.descending ? '-' : '+') + encodeURIComponent(sort.attribute);
-                }
-                if(!sortParam){
-                    query += ")";
+                    POSTParams.sortParams.push(sort);
                 }
             }
-            var results = xhr("GET", {
-                url: this.target + (query || ""),
-                handleAs: "json",
-                headers: headers
+
+            // Paginazione
+            if(options.start >= 0 || options.count >= 0){
+                POSTParams.start = options.start || 0;
+                // Forse options count viene valorizzato anche con Infinity
+                POSTParams.end = options.count + POSTParams.start;
+                POSTParams.count = options.count ;
+            }
+
+            var deferred = new Deferred();
+
+            var results = request.post([this.target,this.queryMethodName].join('/'), {
+                    data: POSTParams,
+                    handleAs: "json",
+                    headers: headers
+                });
+
+            deferred.total = results.then(function(res){
+                deferred.resolve(res.data);
+                return res.total;
             });
-            results.total = results.then(function(){
-                var range = results.ioArgs.xhr.getResponseHeader("Content-Range");
-                return range && (range = range.match(/\/(.*)/)) && +range[1];
-            });
-            return QueryResults(results);
+
+            return QueryResults(deferred);
         }
     });
-
 });

@@ -36,15 +36,6 @@ app.post('/get', function (req, res) {
         return elem.id == parseInt(req.body.id);
     });
 
-    res.send(result);
-});
-
-app.post('/get', function (req, res) {
-    enableCors(res);
-    var result = data.filter(function (elem) {
-        return elem.id == parseInt(req.body.id);
-    });
-
     res.send(result[0]);
 });
 
@@ -67,6 +58,28 @@ app.post('/put', function (req, res) {
 
     res.send(newElement);
 });
+
+app.post('/remove', function (req, res) {
+    enableCors(res);
+    var id =  req.body.id;
+    console.log(id);
+    data.pop();
+    res.send(id);
+});
+
+app.post('/query', function (req, res) {
+    enableCors(res);
+    var queryParams =  req.body;
+    console.log(queryParams);
+
+    var resultData = data.slice(queryParams.start,queryParams.end);
+    resultData.total = data.length;
+    res.send({
+        data: resultData,
+        total: data.length
+    });
+});
+
 
 app.listen(8081, function () {
     console.log('Example app listening on port 8081!');
