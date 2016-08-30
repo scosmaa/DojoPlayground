@@ -15,8 +15,7 @@ define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "d
             declare.safeMixin(this, options);
         },
 
-        // headers: Object
-        //		Eventuali header addizionali da passare al server
+        // Eventuali header addizionali da passare al server
         headers: {},
 
         // accepts: String
@@ -111,6 +110,7 @@ define(["dojo/request", "dojo/_base/lang", "dojo/json", "dojo/_base/declare", "d
         //  Si occupa di contattare il server per le operazioni di filtraggio, ordinamento (multiplo)
         //  paginazione, ecc.
         query: function(query, options){
+            // Contiene i parametri che servono al server per la manipolazione dei dati
             var POSTParams = {};
             options = options || {};
 
