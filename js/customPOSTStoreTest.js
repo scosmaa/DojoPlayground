@@ -46,7 +46,7 @@ require([
             columnResizerMinWidth: 10,
             paginationInitialPageSize: 10,
             pageSize: 10,
-            cacheSize: 100, /* WARNING: If the cacheSize = 0  add 'cache-control' : 'no-cache' in the headers field of data store*/
+            //cacheSize: 100, /* WARNING: If the cacheSize = 0  add 'cache-control' : 'no-cache' in the headers field of data store*/
             filterServerMode: true
             // filterSetupQuery: function (expr) {
             //     // Filter data structure is a complex object, we simplify with a query string
