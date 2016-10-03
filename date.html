@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+    <link rel="stylesheet" href="bower_components/dijit/themes/claro/claro.css">
+
+
+    <script>dojoConfig = {parseOnLoad: true}</script>
+    <script src="bower_components/dojo/dojo.js"></script>
+
+    <script>
+        require([
+            "dojo/ready", "dijit/form/DateTextBox"
+        ], function(ready, DateTextBox){
+
+            ready(function(){
+                new DateTextBox({
+                    value: new Date(2009, 0, 20)
+                }, "data-field");
+            });
+        });
+    </script>
+</head>
+<body class="claro">
+<input id="data-field">
+<p><button onClick="alert(dijit.byId('data-field').get('value'))">Get value</button></p>
+<p><button onClick="dijit.byId('data-field').set('value', new Date(2012,0,1))">Set value to 2012-1-1</button></p>
+</body>
+</html>
