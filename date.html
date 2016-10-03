@@ -25,6 +25,7 @@
 <input id="data-field">
 <p><button onClick="alert(dijit.byId('data-field').get('value'))">Get value</button></p>
 <!--Per assegnare il valore occorre passare un oggetto di tipo Date oppure una stringa con notazione json Date nel formato ("YYYY-MM-DDTHH:MM:SS.mmmZ")-->
+<!--https://www.w3.org/TR/NOTE-datetime-->
 <p><button onClick="dijit.byId('data-field').set('value', new Date(2012,0,1))">Set value to 2012-1-1</button></p>
 </body>
 </html>
