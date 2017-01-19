@@ -2,7 +2,6 @@
  * Created by s.cosma on 04/10/2016.
  */
 require([
-        'dojo/parser',
         'dojo/store/Memory',
         'gridx/Grid',
         'gridx/core/model/cache/Sync',
@@ -13,19 +12,52 @@ require([
         'dijit/_TemplatedMixin',
         'dijit/_WidgetsInTemplateMixin',
         'dojo/_base/declare',
-        "dojo/ready",
-        "dojo/dom-construct"
+        'dijit/form/TextBox',
+        'dijit/form/NumberTextBox'
     ],
-    function (parser, Store, Grid, Cache, CellWidget, Edit, TextBox, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, declare, ready,domConstruct) {
+    function (Store, Grid, Cache, CellWidget, Edit, TextBox, _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, declare, TextBox, NumberTextBox) {
+
+        declare('gridx.tests.CustomEditor', [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+            templateString: [
+                '<table><tr><td style="width: 100px;">',
+                '<label>Composer:</label>',
+                '</td><td>',
+                '<div data-dojo-type="dijit.form.TextBox" data-dojo-attach-point="composer"></div>',
+                '</td></tr><tr><td style="width: 100px;">',
+                '<label>Song Name:</label>',
+                '</td><td>',
+                '<div data-dojo-type="dijit.form.TextBox" data-dojo-attach-point="songName"></div>',
+                '</td></tr><tr><td style="width: 100px;">',
+                '<label>Year:</label>',
+                '</td><td>',
+                '<div data-dojo-type="dijit.form.NumberTextBox" data-dojo-attach-point="year"></div>',
+                '</td></tr></table>'
+            ].join(''),
+            _setValueAttr: function(value){
+                this.composer.set('value', value[0]);
+                this.songName.set('value', value[1]);
+                this.year.set('value', parseInt(value[2], 10));
+            },
+            _getValueAttr: function(value){
+                return [
+                    this.composer.get('value'),
+                    this.songName.get('value'),
+                    this.year.get('value')
+                ];
+            },
+            focus: function(){
+                this.composer.focus();
+            }
+        });
 
         //Custom edit grid
-        declare('CustomEdit', [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
+        declare('gridx.tests.CustomEditor2', [_Widget, _TemplatedMixin, _WidgetsInTemplateMixin], {
             templateString: [
                 "<div>Name: <span data-dojo-attach-point='instrument'></span></div>"
             ].join(''),
             _setValueAttr: function(value){
 
-                this.set('instrument', value[0]);
+                this.instrument = value[0];
             },
             _getValueAttr: function(value){
                 return [
@@ -33,46 +65,11 @@ require([
                 ];
             },
             focus: function(){
-                this.instrument.focus();
+                console.log("focus");
             },
 
         });
 
-        declare("BusinessCard", [_Widget, _TemplatedMixin], {
-            templateString:
-            "<div class='businessCard'>" +
-            "<div>Name: <span data-dojo-attach-point='nameNode'></span></div>" +
-            "<div>Phone #: <span data-dojo-attach-point='phoneNode'></span></div>" +
-            "</div>",
-
-            // Attributes
-            name: undefined,
-            _setNameAttr: { node: "nameNode", type: "innerHTML" },
-
-            nameClass: "employeeName",
-            _setNameClassAttr: { node: "nameNode", type: "class" },
-
-            phone: undefined,
-            _setPhoneAttr: { node: "phoneNode", type: "innerHTML" },
-
-            _setValueAttr: function(value){
-                this.name.set("value",value[0]);
-                this.phone.set("value", value[1]);
-                console.log(value)
-            }
-        });
-
-        declare("MyFirstWidget", [_Widget], {
-            buildRendering: function(){
-                // create the DOM for this widget
-                this.domNode = domConstruct.create("button", {innerHTML: "push me"});
-            }
-        });
-
-        ready(function(){
-            // Create the widget programmatically and place in DOM
-            (new MyFirstWidget()).placeAt(document.body);
-        });
 
         var result = [];
 
@@ -95,13 +92,21 @@ require([
             {field: 'surname', name: 'Surname'},
             {
                 field: 'instrument', name: 'Main Instrument', editable: true,
-                editor: 'CustomEdit',
+                editor: 'gridx.tests.CustomEditor',
                 editorArgs: {
                     //Feed our editor with proper values
                     toEditor: function (storeData, gridData) {
                         debugger;
-                        return ["Simone", "Cosma"];
+                        return ["Simone", "Cosma", 1985];
                     }
+                },
+                //Define our own "applyEdit" process
+                customApplyEdit: function(cell, value){
+                    return cell.row.setRawData({
+                        name: value[0],
+                        surname: value[1],
+                        instrument: value[2]
+                    });
                 }
             }
         ];
@@ -122,6 +127,4 @@ require([
         }, 'gridNode');
 
         grid.startup();
-
-        parser.parse();
     });
